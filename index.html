@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <title>words words words</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1 id="main-word">[]</h1>
+      <form action="">
+        <input id="letter" autocomplete="off" maxlength="1"/>
+        <br>
+        <div class="buttons">
+          <button id="submit-before" type="button">Before</button>
+          <button id="submit-after" type="button">After</button>
+          <br>
+          <button id="reset-word" type="button">Reset Word</button>
+        </div>
+      </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="/js/client.js"></script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+body {
+  background-color: #001111;
+  color: white;
+  margin-top: 10%;
+}
+
+#main-word {
+  font-size: 50px;
+  min-height: 50px;
+  text-align: center;
+}
+
+form > * {
+  margin: auto;
+  display: block;
+  text-align: center;
+}
+
+.buttons > * {
+  margin: auto;
+}
