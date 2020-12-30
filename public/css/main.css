@@ -1,7 +1,6 @@
 body {
   background-color: #001111;
   color: white;
-  margin-top: 10%;
 }
 
 #main-word {
@@ -18,4 +17,34 @@ form > * {
 
 .buttons > * {
   margin: auto;
+}
+
+#navbar {
+  padding-bottom: 10px;
+  width: 50%;
+}
+
+#banner {
+  display: block;
+  height: 4rem;
+}
+
+#word-wrapper {
+  margin: auto;
+}
+
+.navbar-header {
+  font-size: 2rem;
+  float: left;
+}
+
+.navbar-links {
+  display: flex;
+  float: right;
+  margin: auto;
+}
+
+.navbar-links > a {
+  margin: auto;
+  font-size: 1.5rem;
 }

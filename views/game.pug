@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  #word-wrapper
+    h1#main-word []
+  form(action="")
+    input(autocomplete="off" maxlength="1")#letter
+    br
+    .buttons
+      button(type="button")#submit-before Before
+      button(type="button")#submit-after After
+      br
+      button(type="button")#reset-word Reset Word
+
+  br
+  p Your socket id is: ##{SID}
+  script(src="/socket.io/socket.io.js")
+  script(src="/js/client.js")

@@ -1,45 +1,38 @@
-var express= require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var port = process.env.PORT || 3000;
+const express= require('express');
+const http = require('http');
+const socketio = require('socket.io');
 
-let word = "";
+const pool = require("./helpers/db.js");
 
-app.use(express.static('public'));
+const port = process.env.PORT || 3000;
+// let word = "";
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-});
+function startServer() {
+  const app = express();
+  const server = http.createServer(app);
+  const io = socketio(server);
 
-function loadWord(str) {
-  // fires the 'load word' event to update the current word for all sockets
-  io.emit('load word', str);
+  module.exports = { io : io , pool : pool};
+
+  // view engine setup
+  app.set('views', './views');
+  app.set('view engine', 'pug');
+
+  const index = require("./routes/index");
+  const game = require("./routes/game");
+
+  app.use(express.static('public'));
+
+  app.use('/', index);
+  app.use('/game', game);
+
+  server.listen(port, function(){
+    console.log('listening on *:' + port);
+  });
+
+  app.use(function err404(req, res, next) {
+    res.status(404).render("404", { title: "Oops!" });
+  });
 }
 
-io.on('connection', function(socket){
-  // loads the current word to the client's screen when connected
-  loadWord(word);
-  
-  // when a client adds a letter, update it for everyone
-  socket.on('letter before', function(letter){
-    word = letter + word;
-    loadWord(word);
-  });
-
-  socket.on('letter after', function(letter){
-    word = word + letter;
-    loadWord(word);
-  });
-
-  // reset the word
-  socket.on('reset word', () => {
-    word = "";
-    loadWord(word);
-  })
-  
-});
-
-http.listen(port, function(){
-  console.log('listening on *:' + port);
-});
+startServer();
