@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("../app").pool;
+const cookies = require("../helpers/cookies");
 
-router.get('/', async function (req, res, next) {
-  let qResponse = await pool.query("SELECT * FROM games");
-  res.render('index', {title: 'Express is pretty pog!!!', qResponse: JSON.stringify(qResponse)});
+router.use(cookies.assignSID);
+
+router.get('/', function (req, res, next) {
+  res.render('index', {title: 'Express is pretty pog!!!'});
 });
 
 module.exports = router;
+
