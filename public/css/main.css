@@ -1,6 +1,7 @@
 body {
   background-color: #001111;
   color: white;
+  text-align: center;
 }
 
 #main-word {
@@ -17,6 +18,11 @@ form > * {
 
 .buttons > * {
   margin: auto;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
 }
 
 #navbar {

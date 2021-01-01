@@ -19,7 +19,7 @@ $(document).ready(function () {
     $("#player-list").empty();
     for (i of arr) {
       console.log("name: " + i)
-      $("#player-list").append(`<ul>${i}</ul>`);
+      $("#player-list").append(`<li>${i}</li>`);
     }
   })
 

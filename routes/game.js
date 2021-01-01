@@ -19,7 +19,11 @@ router.get('/:gameId', async (req, res, next) => {
   const code = req.params.gameId;
   const SID = req.session.SID;
   let auth = await isAuth(code);
+  console.log(req.session.name);
 
+  if (req.session.name === undefined) {
+    res.redirect('../')
+  }
   // check if game exists
   if (auth) {
     let gameInfo = await db.getGameInfo(code);
