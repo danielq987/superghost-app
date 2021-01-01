@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("../helpers/db");
+const db = require("../helpers/db");
 const room = require("../helpers/room");
 const { route } = require(".");
 
@@ -9,47 +9,29 @@ router.all('/', function (req, res, next) {
 });
 
 // creates a game 
-router.post('/create-game', async function (req, res, next) {
-  try {
-    // set the game cookie
-    let SID = req.session.SID;
-    req.session.name = req.body.name;
-    let code = room.generateRoomKey();
+router.post('/create-game', function (req, res, next) {
+  // set cookies
+  req.session.name = req.body.name;
 
-    // insert into database
-    const newRoom = await pool.query(
-    "INSERT INTO games (code, creator_id, admin_id, player_ids) VALUES ($1, $2, $2, $3) RETURNING *", 
-    [code, SID, `{${SID}}`]);
+  let SID = req.session.SID;
+  let code = room.generateRoomKey();
 
-    console.log(newRoom.rows[0]);
-    res.json(newRoom.rows[0]);
-  } catch (err) {
-    console.error("Error INSERTING INTO:" + err);
-  }
+  // insert into database and return as json
+  db.createRoom(code, SID).then(response => res.json(response)).catch(err => console.error(error));
+
 });
 
 // adds 
-router.put('/join-game/:gameId', async function (req, res, next) {
+router.put('/join-game/:gameId', function (req, res, next) {
   req.session.name = req.body.name;
-  try {
-    // add session id to database
-    const update = await pool.query("UPDATE games SET player_ids = array_append(player_ids, $1) WHERE state = 0 AND code = $2 RETURNING *",
-    [req.session.SID, req.params.gameId]);
-    res.json(update.rows);
-  } catch (error) {
-    console.error("Could not put " + error);
-  }
+  // add session id to database
+  db.addPlayerToGame(req.params.gameId, req.session.SID).then(response => res.json(response));
+  
 })
 
 // gets a specific game's information
-router.get('/games/:gameId', async function (req, res, next) {
-  try {
-    let q = await pool.query("SELECT * FROM games WHERE code=$1", [req.params.gameId]);
-    console.log(`Got ${req.params.gameId}`)
-    res.json(q.rows[q.rows.length - 1]);
-  } catch (error) {
-    console.error("Error getting game information. " + error);
-  }
+router.get('/games/:gameId', function (req, res, next) {
+  db.getGameInfo(req.params.gameId).then(response => res.json(response));
 });
 
 router.delete('/games/:gameID', async function (req, res, next) {

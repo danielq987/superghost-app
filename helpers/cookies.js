@@ -1,4 +1,11 @@
 const { v4: uuidv4 } = require("uuid");
+const base64 = require("base-64");
+
+// decode cookies
+// jank af
+function decode(input) {
+  return JSON.parse(base64.decode(input));
+}
 
 function assignSID(req, res, next) {
   let cookie = req.session.SID;
@@ -16,5 +23,6 @@ function assignSID(req, res, next) {
 }
 
 module.exports = {
-  assignSID: assignSID
+  assignSID: assignSID,
+  decode: decode
 }

@@ -1,5 +1,8 @@
 $(document).ready(function () {
+  let code = window.location.pathname.split('/')[2];
+  console.log(code);
   var socket = io();
+  socket.emit('join room', code);
 
   let word = "";
 
@@ -12,21 +15,29 @@ $(document).ready(function () {
     renderWord();
   })
 
+  socket.on("load player list", (arr) => {
+    $("#player-list").empty();
+    for (i of arr) {
+      console.log("name: " + i)
+      $("#player-list").append(`<ul>${i}</ul>`);
+    }
+  })
+
   $("#submit-before").on("click", (e) => {
     e.preventDefault();
-    socket.emit("letter before", $("#letter").val());
+    socket.emit("letter before", $("#letter").val() + word, code);
     $("#letter").val("");
   });
 
   $("#submit-after").on("click", (e) => {
     e.preventDefault();
-    socket.emit("letter after", $("#letter").val());
+    socket.emit("letter after", word + $("#letter").val(), code);
     $("#letter").val("");
   });
 
   $("#reset-word").on("click", (e) => {
     e.preventDefault();
-    socket.emit("reset word");
+    socket.emit("reset word", code);
     $("#letter").val("");
   });
 
