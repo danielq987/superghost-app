@@ -2,29 +2,14 @@ const express = require("express");
 const router = express.Router();
 const cookies = require("../helpers/cookies");
 const io = require("../app").io;
+const pool = require("../helpers/db");
 const room = require("../helpers/room");
-const axios = require("axios");
 
 // function to check if player is authorized to access that game room
 async function isAuth(SID, gameId) {
-  try {
-    // checks if game code is active
-    let activeCodes = await room.getActiveCodes();
-    isValidRoom = activeCodes.includes(gameId);
-    
-    if (!isValidRoom) {
-      return false;
-    }
-
-    // check if client SID is in database
-    // NOTE: the proxy is needed to be set or else it throws a ECONNREFUSED error ??
-    const response = await axios.get(`/api/games/${gameId}`);
-    isValidPlayer = response.data.player_ids.includes(SID);
-    return (isValidPlayer);
-  } catch (error) {
-    console.error(`Error checking authorization. ${error}`)
-    return false;
-  }
+  // checks if game code is active
+  let activeCodes = await room.getActiveCodes();
+  return activeCodes.includes(gameId);
 }
 
 router.use(cookies.assignSID);
