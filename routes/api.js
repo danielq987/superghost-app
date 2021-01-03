@@ -11,30 +11,35 @@ router.all('/', function (req, res, next) {
 // creates a game 
 router.post('/create-game', function (req, res, next) {
   // set cookies
-  req.session.name = req.body.name;
-
+  let name = req.body.name;
   let SID = req.session.SID;
   let code = room.generateRoomKey();
 
   // insert into database and return as json
-  db.createRoom(code, SID).then(response => res.json(response)).catch(err => console.error(error));
-
+  db.createRoom(code, SID, name).then(response => res.json(response)).catch(err => console.error(err));
 });
 
 // adds 
-router.put('/join-game/:gameId', function (req, res, next) {
-  req.session.name = req.body.name;
+router.put('/join-game/:code', function (req, res, next) {
   // add session id to database
-  db.addPlayerToGame(req.params.gameId, req.session.SID).then(response => res.json(response));
-  
+  db.addPlayer(req.params.code, req.session.SID, req.body.name).then(response => res.json(response));
+})
+
+router.put('/remove-player/:code', function (req, res, next) {
+  // add session id to database
+  db.removePlayer(req.params.code, req.body.name).then(response => res.json(response));
 })
 
 // gets a specific game's information
-router.get('/games/:gameId', function (req, res, next) {
-  db.getGameInfo(req.params.gameId).then(response => res.json(response));
+router.get('/games/:code', function (req, res, next) {
+  db.getGameByCode(req.params.code).then(response => res.json(response));
 });
 
-router.delete('/games/:gameID', async function (req, res, next) {
+router.get('/games/:code/players', function (req, res, next) {
+  db.getGameByCode(req.params.code).then(response => res.json(response.player_info));
+});
+
+router.delete('/games/:code', async function (req, res, next) {
   res.json("todo");
 });
 

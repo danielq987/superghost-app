@@ -15,12 +15,17 @@ $(document).ready(function () {
     renderWord();
   })
 
+  // loads the list of players in the room
   socket.on("load player list", (arr) => {
     $("#player-list").empty();
     for (i of arr) {
       console.log("name: " + i)
       $("#player-list").append(`<li>${i}</li>`);
     }
+  })
+
+  socket.on("start game", () => {
+    location.reload();
   })
 
   $("#submit-before").on("click", (e) => {
@@ -39,6 +44,11 @@ $(document).ready(function () {
     e.preventDefault();
     socket.emit("reset word", code);
     $("#letter").val("");
+  });
+
+  $("#start-game").on("click", (e) => {
+    e.preventDefault();
+    socket.emit("start-game", code);
   });
 
 });

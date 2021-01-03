@@ -21,7 +21,7 @@ const pool = new Pool(config);
 /* Common Database Querying Functions */
 
 async function getActiveCodes(state) {
-  let activeCodes = await pool.query("SELECT code FROM games WHERE state = 0 OR state = 1");
+  let activeCodes = await pool.query("SELECT code FROM games WHERE state = 0");
   let codeArray = [];
   for (i of activeCodes.rows) {
     codeArray.push(i.code);
@@ -29,24 +29,61 @@ async function getActiveCodes(state) {
   return codeArray;
 }
 
-async function createRoom(code, creatorSID) {
-  const newRoom = await pool.query(
-    "INSERT INTO games (code, creator_id, admin_id, player_ids) VALUES ($1, $2, $2, $3) RETURNING *", 
-    [code, creatorSID, `{${creatorSID}}`]);
-  return newRoom.rows[0];
+async function createRoom(code, creatorSID, name) {
+  try {
+    const newRooms = await pool.query(
+      "INSERT INTO games (code, creator_id, player_info) VALUES ($1, $2, $3) RETURNING *", 
+      [code, creatorSID, `{ "${creatorSID}" : {"name": "${name}", "points": 0}}`]);
+    return newRooms.rows[0];
+  } catch (error) {
+    console.error("Error creating room. " + error)
+  }
 }
 
-async function addPlayerToGame(code, playerSID) {
+async function addPlayer(code, playerSID, name) {
   try {
-    const update = await pool.query("UPDATE games SET player_ids = array_append(player_ids, $1) WHERE state = 0 AND code = $2 RETURNING *",
-    [playerSID, code]);
+    let { player_info : playerInfo } = await getGameByCode(code);
+    playerInfo[playerSID] = {"name": name, "points": 0};
+    const update = await pool.query("UPDATE games SET player_info = $1 WHERE state = 0 AND code = $2 RETURNING *",
+    [JSON.stringify(playerInfo), code]);
     return update.rows;
   } catch (error) {
     console.error("Error adding player to game. " + error);
   }
 }
 
-async function getGameInfo(code) {
+async function removePlayer(code, name) {
+  try {
+    let { player_info : playerInfo } = await getGameByCode(code);
+    for (SID in playerInfo) {
+      if (playerInfo[SID].name == name) {
+        delete playerInfo[SID];
+        break;
+      }
+    }
+    const update = await pool.query("UPDATE games SET player_info = $1 WHERE state = 0 AND code = $2 RETURNING *",
+    [JSON.stringify(playerInfo), code]);
+    return update.rows;
+  } catch (error) {
+    console.error("Error adding player to game. " + error);
+  }
+}
+
+async function editSocketId(code, SID, socketId) {
+  try {
+    let { player_info : playerInfo } = await getGameByCode(code);
+    playerInfo[SID].socketId = socketId;
+
+    const update = await pool.query("UPDATE games SET player_info = $1 WHERE state = 0 AND code = $2 RETURNING *",
+    [JSON.stringify(playerInfo), code]);
+    return update.rows;
+  } catch (error) {
+    console.error("Error updating socketID. " + error);
+  }
+}
+
+// returns the active game infowith a certain code
+async function getGameByCode(code) {
   try {
     const gameInfo = await pool.query("SELECT * FROM games WHERE code=$1", [code]);
     return gameInfo.rows[gameInfo.rows.length - 1];
@@ -55,6 +92,36 @@ async function getGameInfo(code) {
   }
 }
 
+async function changeState(gameId, state) {
+  try {
+    const update = await pool.query("UPDATE games SET state=$1 WHERE game_id=$2", [state, gameId]);
+    return update.rows[0];
+  } catch (error) {
+    console.error("Error changing game state. " + error);
+  }
+}
+
+async function startGame(code) {
+  try {
+    const { game_id: gameId } = await getGameByCode(code);
+    const response = await changeState(gameId, 1);
+    return response;
+  } catch (error) {
+    console.error("Error starting game." + error);
+  }
+}
+
+async function endGame(code) {
+  try {
+    const { game_id: gameId } = await getGameByCode(code);
+    const response = await changeState(gameId, 2);
+    return response;
+  } catch (error) {
+    console.error("Error ending game." + error); 
+  }
+}
+
+// updating the word with a new word
 async function updateWord(newWord, code) {
   try {
     const update = await pool.query("UPDATE games SET current_word = $1 WHERE (state = 0 OR state = 1) AND code = $2 RETURNING *",
@@ -69,7 +136,11 @@ module.exports = {
   pool: pool,
   getActiveCodes: getActiveCodes,
   createRoom: createRoom,
-  addPlayerToGame: addPlayerToGame,
-  getGameInfo: getGameInfo,
-  updateWord: updateWord
+  addPlayer: addPlayer,
+  removePlayer: removePlayer,
+  editSocketId: editSocketId,
+  getGameByCode: getGameByCode,
+  updateWord: updateWord,
+  startGame: startGame,
+  endGame: endGame
 };

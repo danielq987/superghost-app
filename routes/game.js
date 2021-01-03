@@ -3,7 +3,7 @@ const router = express.Router();
 const cookies = require("../helpers/cookies");
 
 const db = require("../helpers/db");
-const runGame = require("../helpers/socketio");
+const runGame = require("../helpers/runGame");
 
 // function to check if player is authorized to access that game room
 async function isAuth(gameId) {
@@ -19,19 +19,17 @@ router.get('/:gameId', async (req, res, next) => {
   const code = req.params.gameId;
   const SID = req.session.SID;
   let auth = await isAuth(code);
-  console.log(req.session.name);
 
-  if (req.session.name === undefined) {
-    res.redirect('../')
-  }
   // check if game exists
   if (auth) {
-    let gameInfo = await db.getGameInfo(code);
-    // if player id not in database, add it
-    if (!(gameInfo.player_ids.includes(SID))) {
-      db.addPlayerToGame(code, SID);
+    let { player_info: playerInfo } = await db.getGameByCode(code);
+    
+    if (playerInfo[SID].name === undefined) {
+      res.redirect('../');
     }
-    res.render("game", { title: "Game", name: req.session.name});
+    // add the player to the database
+    db.addPlayer(code, SID);
+    res.render("start", { title: "Start" });
   }
   // game does not exist
   else {

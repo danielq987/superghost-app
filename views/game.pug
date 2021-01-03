@@ -1,6 +1,8 @@
 extends layout
 
 block content
+  //- The game goes in this div!
+  #game-container 
   #word-wrapper
     h1#main-word []
   form(action="")
@@ -17,3 +19,7 @@ block content
   ul#player-list
   script(src="/socket.io/socket.io.js")
   script(src="/public/js/game-client.js")
+
+  //- react sources
+  script(src="https://unpkg.com/react@17/umd/react.development.js" crossorigin)
+  script(src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin)

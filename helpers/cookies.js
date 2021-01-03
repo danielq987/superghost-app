@@ -1,11 +1,20 @@
 const { v4: uuidv4 } = require("uuid");
 const base64 = require("base-64");
+const cookie = require("cookie"); // module
 
 // decode cookies
 // jank af
 function decode(input) {
   return JSON.parse(base64.decode(input));
 }
+
+// given a socket object, get session
+function getSession(socket) {
+  let session = cookie.parse(socket.request.headers.cookie).session;
+  return(decode(session));
+}
+
+// given a sessionID, get socket ID
 
 function assignSID(req, res, next) {
   let cookie = req.session.SID;
@@ -24,5 +33,5 @@ function assignSID(req, res, next) {
 
 module.exports = {
   assignSID: assignSID,
-  decode: decode
+  getSession: getSession
 }
