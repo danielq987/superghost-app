@@ -3,7 +3,7 @@ const router = express.Router();
 const cookies = require("../helpers/cookies");
 
 const db = require("../helpers/db");
-const runGame = require("../helpers/runGame");
+const runGame = require("../game/runGame");
 
 // function to check if player is authorized to access that game room
 async function isAuth(gameId) {

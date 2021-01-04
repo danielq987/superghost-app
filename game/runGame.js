@@ -1,27 +1,10 @@
 const io = require("../app").io;
-const cookies = require("./cookies"); // own helper
-const db = require("./db");
-
+const db = require("../helpers/db");
+const cookies = require("../helpers/cookies");
+const helpers = require("./gameHelpers");
 
 // functions and listeners pertaining to the game
 function runGame() {
-
-  // iterates through all the active games and check to see if they should be closed
-  setTimeout(() => {
-    // TODO
-  }, 1000 * 60);
-
-  // returns whether the client connected to the socket is the admin of the game room
-  function verifyAdmin(socket, code) {
-    let SID = cookies.getSession(socket).SID;
-    let adminId = db.getGameByCode(code).admin_id;
-    return SID == adminId;
-  }
-
-  function getSocketIdFromSID(SID, code) {
-
-  }
-
   // updates the word in the database
   // fires the 'load word' event to update the current word for all sockets
   async function loadWord(str, code) {
@@ -32,22 +15,7 @@ function runGame() {
       console.error(err);
     }
   }
-
-  // from the database, get a list of player names for the game
-  async function getPlayerNames(player_info) {
-    try {
-      let names = [];
-      // console.log(player_info)
-      for (player in player_info) {
-        names.push(player_info[player].name);
-      }
-      console.log("names: " + names);
-      return names;
-    } catch (error) {
-      console.error("Could not get game info. " + error)
-    }
-  }
-
+  
   io.on('connection', function onConnect (socket) {
 
     /* __________GENERAL GAME SETUP LISTENERS___________ */
@@ -68,7 +36,7 @@ function runGame() {
         }
 
         // gets all player names and emit the list
-        const names = await getPlayerNames(player_info);
+        const names = await helpers.getPlayerNames(player_info);
         io.to(code).emit("load player list", names.sort());
       } catch (error) {
         console.log("Could not get player names. " + error);
