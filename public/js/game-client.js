@@ -48,7 +48,7 @@ $(document).ready(function () {
 
   $("#start-game").on("click", (e) => {
     e.preventDefault();
-    socket.emit("start-game", code);
+    socket.emit("start game", code);
   });
 
 });

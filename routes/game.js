@@ -19,17 +19,23 @@ router.get('/:gameId', async (req, res, next) => {
   const code = req.params.gameId;
   const SID = req.session.SID;
   let auth = await isAuth(code);
+  console.log("test");
 
   // check if game exists
   if (auth) {
-    let { player_info: playerInfo } = await db.getGameByCode(code);
-    
-    if (playerInfo[SID].name === undefined) {
-      res.redirect('../');
+    try {
+      let { player_info: playerInfo, state } = await db.getGameByCode(code);
+      // console.log(playerInfo);
+      if (!playerInfo[SID] || !playerInfo[SID].name) {
+        res.redirect('/');
+      } else if (state == 1) {
+        res.render("game", { title: "Game" })
+      } else {
+        res.render("start", { title: "Start" });
+      }
+    } catch (error) {
+      console.error("Could not get game info." + error);
     }
-    // add the player to the database
-    db.addPlayer(code, SID);
-    res.render("start", { title: "Start" });
   }
   // game does not exist
   else {

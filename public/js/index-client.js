@@ -16,9 +16,22 @@ $(document).ready(function () {
     })
   });
 
-  $("#join-room-btn").on("click", () => {
+  $("#join-room-btn").on("click", async function() {
     let name = $("#game-name").val();
     let code = $("#game-code").val().toUpperCase();
+
+    try {
+      let gameInfo = await axios.get(`/api/games/${code}`);
+      if (gameInfo.data != null && gameInfo.data.state == 0) {
+        // add the new player's SID to the database
+      let response = axios.put(`/api/join-game/${code}`, {name: name});
+      window.location.replace(`/game/${code}`);
+      } else {
+        console.log("room doesnt exist, or not authorized");
+      }
+    } catch (error) {
+      console.error("There was an error making the request." + error);
+    }
 
     // get the game info to ensure that the room exists and is open
     axios.get(`/api/games/${code}`).then(response => {

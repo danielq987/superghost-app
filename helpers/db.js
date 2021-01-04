@@ -21,7 +21,7 @@ const pool = new Pool(config);
 /* Common Database Querying Functions */
 
 async function getActiveCodes(state) {
-  let activeCodes = await pool.query("SELECT code FROM games WHERE state = 0");
+  let activeCodes = await pool.query("SELECT code FROM games WHERE state = 0 or state = 1");
   let codeArray = [];
   for (i of activeCodes.rows) {
     codeArray.push(i.code);
@@ -72,8 +72,8 @@ async function removePlayer(code, name) {
 async function editSocketId(code, SID, socketId) {
   try {
     let { player_info : playerInfo } = await getGameByCode(code);
+    console.log(playerInfo);
     playerInfo[SID].socketId = socketId;
-
     const update = await pool.query("UPDATE games SET player_info = $1 WHERE state = 0 AND code = $2 RETURNING *",
     [JSON.stringify(playerInfo), code]);
     return update.rows;

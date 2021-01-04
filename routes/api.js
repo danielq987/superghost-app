@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const db = require("../helpers/db");
 const room = require("../helpers/room");
-const { route } = require(".");
 
 router.all('/', function (req, res, next) {
   res.json("It works!");  
@@ -22,7 +21,8 @@ router.post('/create-game', function (req, res, next) {
 // adds 
 router.put('/join-game/:code', function (req, res, next) {
   // add session id to database
-  db.addPlayer(req.params.code, req.session.SID, req.body.name).then(response => res.json(response));
+  console.log(req.body.name + "name");
+  db.addPlayer(req.params.code, req.session.SID, req.body.name).then(response => {console.log("aaa" + JSON.stringify(response)); res.json(response)});
 })
 
 router.put('/remove-player/:code', function (req, res, next) {

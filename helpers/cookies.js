@@ -11,7 +11,7 @@ function decode(input) {
 // given a socket object, get session
 function getSession(socket) {
   let session = cookie.parse(socket.request.headers.cookie).session;
-  return(decode(session));
+  return(decode(session).SID);
 }
 
 // given a sessionID, get socket ID

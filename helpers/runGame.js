@@ -37,9 +37,11 @@ function runGame() {
   async function getPlayerNames(player_info) {
     try {
       let names = [];
+      // console.log(player_info)
       for (player in player_info) {
         names.push(player_info[player].name);
       }
+      console.log("names: " + names);
       return names;
     } catch (error) {
       console.error("Could not get game info. " + error)
@@ -55,7 +57,7 @@ function runGame() {
       socket.join(code);
       try {
         // update socketId in database
-        await db.editSocketId(code, socket.id);
+        await db.editSocketId(code, cookies.getSession(socket), socket.id);
 
         // get the game info
         const { state, player_info, current_word } = await db.getGameByCode(code);
@@ -66,7 +68,7 @@ function runGame() {
         }
 
         // gets all player names and emit the list
-        const names = await getPlayerNames(code, player_info);
+        const names = await getPlayerNames(player_info);
         io.to(code).emit("load player list", names.sort());
       } catch (error) {
         console.log("Could not get player names. " + error);
@@ -77,7 +79,7 @@ function runGame() {
     // emits the 'start game event' to everyone in the room
     socket.on('start game', async (code) => {
       await db.startGame(code);
-      io.to(socketId).emit("current turn");
+      // io.to(socketId).emit("current turn");
       io.to(code).emit('start game');
     })
 
