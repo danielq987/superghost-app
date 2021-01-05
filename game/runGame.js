@@ -47,13 +47,13 @@ function runGame() {
     // emits the 'start game event' to everyone in the room
     socket.on('start game', async (code) => {
       await db.startGame(code);
-      // io.to(socketId).emit("current turn");
+      // TODO: emit current turn
       io.to(code).emit('start game');
     })
 
     // Listener for when a player makes a move
     // Emits to next player the "current turn" event 
-    socket.on('next turn', async function (code) {
+    socket.on('finish turn', async function (code) {
       // get session ID of next player
       const { player_info, turn_index } = db.getGameByCode(code);
       
@@ -61,7 +61,7 @@ function runGame() {
       socketId = // TODO
 
       loadWord(word, code);
-      io.to(socketId).emit("current turn");
+      io.to(socketId).emit("start turn");
     })
     
     /* _______CHAT LISTENERS____________ */
@@ -95,7 +95,7 @@ function runGame() {
       */
     });
 
-    socket.on("prompt", (code, successful) => {
+    socket.on("challenge complete", (code, successful) => {
       // TODO
       /* Frontend handles whether or not the word was a phony or not, and after some delay,
       backend emits to everyone whether the challenge was successful or not 
