@@ -87,7 +87,7 @@ function runGame() {
     /* _______CHALLENGE LISTENERS____________*/
     
     // Listener for challenger choosing "isWord" challenge
-    socket.on("challenge", (code, type) => {
+    socket.on("challenge", async function (code, type) {
       // emits to everyone but the sender
       const { player_info, turn_index } = await db.getGameByCode(code);
       const challenger = cookies.getSession(socket);
