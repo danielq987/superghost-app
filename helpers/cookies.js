@@ -33,5 +33,6 @@ function assignSID(req, res, next) {
 
 module.exports = {
   assignSID: assignSID,
-  getSession: getSession
+  getSession: getSession,
+  decode: decode
 }

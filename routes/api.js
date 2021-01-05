@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../helpers/db");
 const room = require("../helpers/room");
+const cookies = require("../helpers/cookies");
 
 router.all('/', function (req, res, next) {
   res.json("It works!");  
@@ -32,11 +33,20 @@ router.put('/remove-player/:code', function (req, res, next) {
 
 // gets a specific game's information
 router.get('/games/:code', function (req, res, next) {
-  db.getGameByCode(req.params.code).then(response => res.json(response));
+  db.getGameByCode(req.params.code).then(response => {
+    response.current_player_SID = Object.keys(response.player_info).sort()[response.turn_index];
+    res.json(response);
+  });
 });
 
 router.get('/games/:code/players', function (req, res, next) {
   db.getGameByCode(req.params.code).then(response => res.json(response.player_info));
+});
+
+router.get('/games/:code/player/:SID', function (req, res, next) {
+  db.getGameByCode(req.params.code).then(response => {
+    res.json(response.player_info[SID]);
+  });
 });
 
 router.delete('/games/:code', async function (req, res, next) {

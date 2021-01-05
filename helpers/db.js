@@ -122,13 +122,29 @@ async function endGame(code) {
 }
 
 // updating the word with a new word
-async function updateWord(newWord, code) {
+async function resetWord(code) {
   try {
-    const update = await pool.query("UPDATE games SET current_word = $1 WHERE (state = 0 OR state = 1) AND code = $2 RETURNING *",
-    [newWord, code]);
+    const update = await pool.query("UPDATE games SET current_word = '' WHERE (state = 0 OR state = 1) AND code = $1 RETURNING *",
+    [code]);
     return update.rows[0].current_word;
   } catch (error) {
     console.error("Error updating word. " + error);
+  }
+}
+
+// if position is negative, add letter before. if position is positive, add letter after.
+async function addLetter(code, letter, position) {
+  try {
+    if (position < 0) {
+      const update = await pool.query("UPDATE games SET current_word = $1 + current_word WHERE (state = 1) AND code = $2 RETURNING *",
+      [letter, code]);
+    } else {
+      const update = await pool.query("UPDATE games SET current_word = current_word + $1 WHERE (state = 1) AND code = $2 RETURNING *",
+      [letter, code]);
+    }
+    return update.rows[0].current_word;
+  } catch (error) {
+    console.error("Could not add letter. " + error);
   }
 }
 
@@ -149,7 +165,8 @@ module.exports = {
   removePlayer: removePlayer,
   editSocketId: editSocketId,
   getGameByCode: getGameByCode,
-  updateWord: updateWord,
+  resetWord: resetWord,
+  addLetter: addLetter,
   startGame: startGame,
   endGame: endGame,
   incrementTurn: incrementTurn
