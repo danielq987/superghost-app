@@ -28,7 +28,15 @@ async function getPlayerNames(player_info) {
   }
 }
 
+// returns the SID of the next player in line
+// sorts the session ID's in alphabetical order to generate the order
+async function getNextPlayer(code, player_info) {
+  const turn_index = await db.incrementTurn(code);
+  return Object.keys(player_info).sort()[turn_index];
+}
+
 module.exports = {
   verifyAdmin: verifyAdmin,
-  getPlayerNames: getPlayerNames
+  getPlayerNames: getPlayerNames,
+  getNextPlayer: getNextPlayer
 }

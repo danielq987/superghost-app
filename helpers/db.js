@@ -132,6 +132,15 @@ async function updateWord(newWord, code) {
   }
 }
 
+async function incrementTurn(code) {
+  try {
+    const update = await pool.query("UPDATE games SET turn_index=turn_index+1 WHERE code=$1 AND state=1", [code]);
+    return update.rows[0].turn_index;
+  } catch (error) {
+    console.error("Could not increment the turn.");
+  }
+}
+
 module.exports = {
   pool: pool,
   getActiveCodes: getActiveCodes,
@@ -142,5 +151,6 @@ module.exports = {
   getGameByCode: getGameByCode,
   updateWord: updateWord,
   startGame: startGame,
-  endGame: endGame
+  endGame: endGame,
+  incrementTurn: incrementTurn
 };

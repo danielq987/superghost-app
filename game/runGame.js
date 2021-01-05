@@ -7,7 +7,7 @@ const helpers = require("./gameHelpers");
 function runGame() {
   // updates the word in the database
   // fires the 'load word' event to update the current word for all sockets
-  async function loadWord(str, code) {
+  async function loadWord(code, str) {
     try {
       response = await db.updateWord(str, code);
       io.to(code).emit("load word", response);
@@ -53,14 +53,15 @@ function runGame() {
 
     // Listener for when a player makes a move
     // Emits to next player the "current turn" event 
-    socket.on('finish turn', async function (code) {
+    socket.on('finish turn', async function (code, word) {
       // get session ID of next player
-      const { player_info, turn_index } = db.getGameByCode(code);
+      const { player_info } = await db.getGameByCode(code);
+      const nextSID = await helpers.getNextPlayer(code, player_info);
       
       // get the socketId of the next player
-      socketId = // TODO
+      socketId = player_info[nextSID].socketId;
 
-      loadWord(word, code);
+      loadWord(code, word);
       io.to(socketId).emit("start turn");
     })
     
@@ -107,16 +108,16 @@ function runGame() {
     
     // when a client adds a letter, update it for everyone
     socket.on('letter before', (word, code) => {
-      loadWord(word, code);
+      loadWord(code, word);
     });
   
     socket.on('letter after', (word, code) => {
-      loadWord(word, code);
+      loadWord(code, word);
     });
   
     // reset the word
     socket.on('reset word', (code) => {
-      loadWord("", code);
+      loadWord(code, "");
     })
   });
 }
