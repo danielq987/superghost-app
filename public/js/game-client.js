@@ -1,6 +1,5 @@
 $(document).ready(function () {
   let code = window.location.pathname.split('/')[2];
-  console.log(code);
   var socket = io();
   socket.emit('join room', code);
 
@@ -19,7 +18,6 @@ $(document).ready(function () {
   socket.on("load player list", (arr) => {
     $("#player-list").empty();
     for (i of arr) {
-      console.log("name: " + i)
       $("#player-list").append(`<li>${i}</li>`);
     }
   })
