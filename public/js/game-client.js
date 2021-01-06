@@ -11,15 +11,11 @@ $(document).ready(function () {
 
   // check word function
   function checkWord() {
-    success = false;
+    var success = false;
     axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`).then((res) => 
     {
-      console.log(`comparing ${word} and ${res.word}`);
-      if (res.status !== 200) {
-        if (res.status === 404) {
-          console.log("This is not a word");
-        }
-      } else if (word !== res.data[0].word) {
+      console.log(res);
+      if (word !== res.data[0].word) {
         console.log("This is a misspelled word");
       } else {
         console.log("This is a word");
@@ -27,7 +23,8 @@ $(document).ready(function () {
       }
       socket.emit("check word", code, success);
     }).catch((error) => {
-      console.error(error);
+      console.log("This is not a word");
+      socket.emit("check word", code, success);
     });
   }
 
