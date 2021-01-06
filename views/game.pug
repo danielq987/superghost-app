@@ -3,6 +3,8 @@ extends layout
 block content
   //- The game goes in this div!
   #game-container 
+    //- Chat Component
+    <div id="chat_container"></div>
   #word-wrapper
     h1#main-word []
   form(action="")
@@ -23,3 +25,5 @@ block content
   //- react sources
   script(src="https://unpkg.com/react@17/umd/react.development.js" crossorigin)
   script(src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin)
+  script(src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin)
+  script(type="module text/babel" src="/public/react/chat.js")
