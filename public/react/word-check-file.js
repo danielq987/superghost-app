@@ -28,5 +28,5 @@ class Word extends React.Component {
   }
 }
 
-const domContainer = document.querySelector('#check-word');
+const domContainer = document.querySelector('#test');
 ReactDOM.render(e(Word), domContainer);

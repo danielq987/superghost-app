@@ -1,48 +1,44 @@
 $(document).ready(function () {
-  let code = window.location.pathname.split('/')[2];
+  let code = window.location.pathname.split("/")[2];
   var socket = io();
-  socket.emit('join room', code);
+  socket.emit("join room", code);
 
   let word = "";
 
   function renderWord() {
-    $("#main-word").text('[' + word + ']');
+    $("#main-word").text("[" + word + "]");
   }
 
   // check word function
-  function checkWord(e) {
-    e.preventDefault();
-    
-    axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`, {
-        })
-        .then((res) => {
-            
-            if (res.status !== 200) {
-                
-                if (res.status === 404) {
-                    console.log("This is not a word")
-                }
-            } else {
-                if (word !== res.word){
-                    console.log("This is a misspelled word")
-                } else {
-                  console.log("This is a word")
-                }
-            }
-            
-        })
-        .catch((error) => {
-            console.log(error.message);
-            //console.error(error)
-        })
-
-
+  function checkWord() {
+    success = false;
+    axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`).then((res) => 
+    {
+      console.log(`comparing ${word} and ${res.word}`);
+      if (res.status !== 200) {
+        if (res.status === 404) {
+          console.log("This is not a word");
+        }
+      } else if (word !== res.data[0].word) {
+        console.log("This is a misspelled word");
+      } else {
+        console.log("This is a word");
+        success = true;
+      }
+      socket.emit("check word", code, success);
+    }).catch((error) => {
+      console.error(error);
+    });
   }
+
+  socket.on("word checked", (success) => {
+    $("#debug").html(`${success ? "This is a word!" : "This is not a word!"}`);
+  });
 
   socket.on("load word", (str) => {
     word = str;
     renderWord();
-  })
+  });
 
   // loads the list of players in the room
   socket.on("load player list", (arr) => {
@@ -50,11 +46,11 @@ $(document).ready(function () {
     for (i of arr) {
       $("#player-list").append(`<li>${i}</li>`);
     }
-  })
+  });
 
   socket.on("start game", () => {
     location.reload();
-  })
+  });
 
   $("#submit-before").on("click", (e) => {
     e.preventDefault();
@@ -83,8 +79,6 @@ $(document).ready(function () {
   $("#check-word").on("click", (e) => {
     e.preventDefault();
     checkWord();
-    //socket.emit("check word", word, code);
+    socket.emit("check word", word, code);
   });
-
 });
-

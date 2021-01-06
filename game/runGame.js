@@ -2,7 +2,7 @@ const io = require("../app").io;
 const db = require("../helpers/db");
 const cookies = require("../helpers/cookies");
 const helpers = require("./gameHelpers");
-const axios = require('axios');
+// const axios = require('axios');
 
 // functions and listeners pertaining to the game
 function runGame() {
@@ -18,45 +18,44 @@ function runGame() {
   }
 
   // testing the word check function
-  /*
   async function checkWord(str, code) {
-    try {
-      axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${str}`, {
-        })
-        .then((res) => {
-            if (res.status !== 200) {
-                //throw new Error()
-                if (res.status === 404) {
-                    //setResponseObj("This is not a word")
-                    console.log("This is not a word");
-                }
-            } else {
-                if (str !== res.str){
-                    //setResponseObj("This is a misspelled word")
-                    console.log("This is a misspelled word");
-                } else {
-                  console.log("This is a word")
-                }
-              //setResponseObj(res)
+    // try {
+    //   axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${str}`, {
+    //     })
+    //     .then((res) => {
+    //         if (res.status !== 200) {
+    //             //throw new Error()
+    //             if (res.status === 404) {
+    //                 //setResponseObj("This is not a word")
+    //                 console.log("This is not a word");
+    //             }
+    //         } else {
+    //             if (str !== res.str){
+    //                 //setResponseObj("This is a misspelled word")
+    //                 console.log("This is a misspelled word");
+    //             } else {
+    //               console.log("This is a word")
+    //             }
+    //           //setResponseObj(res)
                 
-                //setLoading(false)
-            }   
-        })
-        .catch((error) => {
-          setError(true);
-          setLoading(false);
-          console.log(error.message);
-          console.error(error)
-      })
+    //             //setLoading(false)
+    //         }   
+    //     })
+    //     .catch((error) => {
+    //       setError(true);
+    //       setLoading(false);
+    //       console.log(error.message);
+    //       console.error(error)
+    //   })
 
-        io.to(code).emit("check word", response);
+    io.to(code).emit("check word", response);
 
-    } catch (error) {
-        console.error(error)
-    }
+    // } catch (error) {
+    //     console.error(error)
+    // }
   } 
-  */
   
+
   io.on('connection', function onConnect (socket) {
 
     /* __________GENERAL GAME SETUP LISTENERS___________ */
@@ -161,11 +160,10 @@ function runGame() {
     });
 
     // check word 
-    /*
-    socket.on('check word', (word, code) => {
-      checkWord(word, code);
+    socket.on('check word', (code, success) => {
+      // checkWord(word, code);
+      io.to(code).emit("word checked", success)
     })
-    */
   });
 }
 
