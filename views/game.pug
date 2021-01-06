@@ -13,13 +13,19 @@ block content
       button(type="button")#submit-after After
       br
       button(type="button")#reset-word Reset Word
+      br
+      button(type="button")#check-word Check Word
+      //-#check-word
 
   br
   h3 Players
   ul#player-list
+
   script(src="/socket.io/socket.io.js")
   script(src="/public/js/game-client.js")
+  //- script(src="/public/react/word-check-file.js")
 
   //- react sources
   script(src="https://unpkg.com/react@17/umd/react.development.js" crossorigin)
   script(src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin)
+  
