@@ -1,11 +1,11 @@
-import React, {useState, useEffect} from 'react';
-import '../css/chat.css';
-import * as db from '../helpers/db' 
-import * as cookies from '../helpers/cookies' 
+// import React, {useState, useEffect} from 'react';
+// import '../css/chat.css';
+// import * as db from '../helpers/db' 
+// import * as cookies from '../helpers/cookies' 
 
-import InfoBar from '../react/infoBar';
-import Input from '../react/input';
-import Messages from '../react/messages';
+import InfoBar from './infoBar';
+import Input from './input';
+import Messages from './messages';
 
 var socket = io();
 
@@ -50,7 +50,7 @@ const Chat = () => {
 }
 
 const domContainer = document.querySelector('#chat_container');
-ReactDOM.render(Chat, domContainer);
+ReactDOM.render(e(Chat), domContainer);
 
 // 'use strict';
 

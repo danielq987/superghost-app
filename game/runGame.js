@@ -33,7 +33,7 @@ function runGame() {
         // if game has started, update the word
         if (state == 1) {
           socket.emit("load word", current_word);
-          if (helpers.isCurrentTurn(code, socket, player_info, turn_index)) {
+          if (helpers.isCurrentTurn(socket, player_info, turn_index)) {
             socket.emit("start turn");
           }
         }
@@ -51,22 +51,26 @@ function runGame() {
         socket.emit('message', {user: "admin", text: `${userName}, welcome to the room.`});
 
       } catch (error) {
-        console.log("Could not get player names. " + error);
+        console.error("Could not get player names. " + error);
       }
     });
     
     // Listener for game start
     // emits the 'start game event' to everyone in the room
     socket.on('start game', async (code) => {
-      await db.startGame(code);
-      
-      const { player_info } = await db.getGameByCode(code);
-      const nextSID = await helpers.getNextPlayer(code, player_info);
-      
-      const socketId = player_info[nextSID].socketId;
-
-      io.to(code).emit('start game');
-      io.to(socketId).emit('start turn');
+      try {
+        await db.startGame(code);
+        
+        const { player_info } = await db.getGameByCode(code);
+        const nextSID = await helpers.getNextPlayer(code, player_info);
+        
+        const socketId = player_info[nextSID].socketId;
+  
+        io.to(code).emit('start game');
+        io.to(socketId).emit('start turn');
+      } catch (error) {
+        console.log(`Error starting game. ${error}`);
+      }
     })
 
     // Listener for when a player makes a move
