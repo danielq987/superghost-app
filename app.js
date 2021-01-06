@@ -29,7 +29,8 @@ function startServer() {
   app.use(cookieSession({
     name: 'session',
     secret: "test12345",
-    maxAge: 24*60*60*1000
+    maxAge: 24*60*60*1000,
+    httpOnly: false
   }));
   app.use(cookieParser("test12345"));
 
