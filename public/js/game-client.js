@@ -51,13 +51,13 @@ $(document).ready(function () {
 
   $("#submit-before").on("click", (e) => {
     e.preventDefault();
-    socket.emit("letter before", $("#letter").val() + word, code);
+    socket.emit("finish turn", code, $("#letter").val(), -1);
     $("#letter").val("");
   });
 
   $("#submit-after").on("click", (e) => {
     e.preventDefault();
-    socket.emit("letter after", word + $("#letter").val(), code);
+    socket.emit("finish turn", code, $("#letter").val(), 1);
     $("#letter").val("");
   });
 

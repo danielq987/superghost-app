@@ -137,11 +137,12 @@ async function resetWord(code) {
 // if position is negative, add letter before. if position is positive, add letter after.
 async function addLetter(code, letter, position) {
   try {
+    let update;
     if (position < 0) {
-      const update = await pool.query("UPDATE games SET current_word = $1 + current_word WHERE (state = 1) AND code = $2 RETURNING *",
+      update = await pool.query("UPDATE games SET current_word = $1 || current_word WHERE (state = 1) AND code = $2 RETURNING *",
       [letter, code]);
     } else {
-      const update = await pool.query("UPDATE games SET current_word = current_word + $1 WHERE (state = 1) AND code = $2 RETURNING *",
+      update = await pool.query("UPDATE games SET current_word = current_word || $1 WHERE (state = 1) AND code = $2 RETURNING *",
       [letter, code]);
     }
     return update.rows[0].current_word;
@@ -152,7 +153,7 @@ async function addLetter(code, letter, position) {
 
 async function incrementTurn(code) {
   try {
-    const update = await pool.query("UPDATE games SET turn_index=turn_index+1 WHERE code=$1 AND state=1", [code]);
+    const update = await pool.query("UPDATE games SET turn_index=turn_index+1 WHERE code=$1 AND (state=0 OR state=1) RETURNING *", [code]);
     return update.rows[0].turn_index;
   } catch (error) {
     console.error("Could not increment the turn.");

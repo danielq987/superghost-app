@@ -32,6 +32,7 @@ async function getPlayerNames(player_info) {
 // sorts the session ID's in alphabetical order to generate the order
 async function getNextPlayer(code, player_info) {
   const turn_index = await db.incrementTurn(code);
+  // console.log(turn_index);
   const numPlayers = Object.keys(player_info).length;
   return Object.keys(player_info).sort()[turn_index % numPlayers];
 }
