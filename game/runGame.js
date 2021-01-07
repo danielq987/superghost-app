@@ -134,8 +134,9 @@ function runGame() {
     });
 
     // reset the word
-    socket.on("reset word", (code) => {
-      loadWord(code, "");
+    socket.on("reset word", async (code) => {
+      await db.resetWord(code);
+      io.to(code).emit("load word", "");
     });
 
     // check word
