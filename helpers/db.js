@@ -1,7 +1,4 @@
 /* Set up database */
-
-require('dotenv').config();
-
 const { Pool } = require('pg');
 const url = require('url')
 

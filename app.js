@@ -4,7 +4,7 @@ const socketio = require('socket.io');
 const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 
-// require('dotenv').config();
+require('dotenv').config();
 
 const port = process.env.PORT || 3000;
 
