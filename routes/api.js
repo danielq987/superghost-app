@@ -2,12 +2,13 @@ const express = require("express");
 const router = express.Router();
 const db = require("../helpers/db");
 const room = require("../helpers/room");
+const cookies = require("../helpers/cookies");
 
 router.all('/', function (req, res, next) {
   res.json("It works!");  
 });
 
-// creates a game 
+// creates a game, returns the game information
 router.post('/create-game', function (req, res, next) {
   // set cookies
   let name = req.body.name;
@@ -18,28 +19,41 @@ router.post('/create-game', function (req, res, next) {
   db.createRoom(code, SID, name).then(response => res.json(response)).catch(err => console.error(err));
 });
 
-// adds 
+// adds a player to the game, using the request's cookies and body
 router.put('/join-game/:code', function (req, res, next) {
   // add session id to database
   console.log(req.body.name + "name");
   db.addPlayer(req.params.code, req.session.SID, req.body.name).then(response => {console.log("aaa" + JSON.stringify(response)); res.json(response)});
 })
 
+// kick a player from the room
 router.put('/remove-player/:code', function (req, res, next) {
   // add session id to database
   db.removePlayer(req.params.code, req.body.name).then(response => res.json(response));
 })
 
 // gets a specific game's information
-router.get('/games/:code', function (req, res, next) {
-  db.getGameByCode(req.params.code).then(response => res.json(response));
+router.get('/game/:code', function (req, res, next) {
+  db.getGameByCode(req.params.code).then(response => {
+    response.current_player_SID = Object.keys(response.player_info).sort()[response.turn_index];
+    res.json(response);
+  });
 });
 
-router.get('/games/:code/players', function (req, res, next) {
+// get player infos of all players in the room
+router.get('/game/:code/players', function (req, res, next) {
   db.getGameByCode(req.params.code).then(response => res.json(response.player_info));
 });
 
-router.delete('/games/:code', async function (req, res, next) {
+// get a specific player information, given their session id
+router.get('/game/:code/player/:SID', function (req, res, next) {
+  db.getGameByCode(req.params.code).then(response => {
+    res.json(response.player_info[SID]);
+  });
+});
+
+// idk yet
+router.delete('/game/:code', async function (req, res, next) {
   res.json("todo");
 });
 

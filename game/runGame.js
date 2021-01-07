@@ -8,7 +8,7 @@ const helpers = require("./gameHelpers");
 function runGame() {
   // updates the word in the database
   // fires the 'load word' event to update the current word for all sockets
-  async function loadWord(str, code) {
+  async function loadWord(code, str) {
     try {
       response = await db.updateWord(str, code);
       io.to(code).emit("load word", response);
@@ -18,7 +18,7 @@ function runGame() {
   }
 
   // testing the word check function
-  async function checkWord(str, code) {
+//   async function checkWord(str, code) {
     // try {
     //   axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${str}`, {
     //     })
@@ -48,12 +48,12 @@ function runGame() {
     //       console.error(error)
     //   })
 
-    io.to(code).emit("check word", response);
+//     io.to(code).emit("check word", response);
 
     // } catch (error) {
     //     console.error(error)
     // }
-  } 
+//   } 
   
 
   io.on('connection', function onConnect (socket) {
@@ -68,11 +68,14 @@ function runGame() {
         await db.editSocketId(code, cookies.getSession(socket), socket.id);
 
         // get the game info
-        const { state, player_info, current_word } = await db.getGameByCode(code);
+        const { state, player_info, current_word, turn_index } = await db.getGameByCode(code);
 
         // if game has started, update the word
         if (state == 1) {
           socket.emit("load word", current_word);
+          if (helpers.isCurrentTurn(code, socket, player_info, turn_index)) {
+            socket.emit("start turn");
+          }
         }
 
         // gets all player names and emit the list
@@ -87,20 +90,28 @@ function runGame() {
     // emits the 'start game event' to everyone in the room
     socket.on('start game', async (code) => {
       await db.startGame(code);
-      // TODO: emit current turn
+      
+      const { player_info } = await db.getGameByCode(code);
+      const nextSID = await helpers.getNextPlayer(code, player_info);
+      
+      const socketId = player_info[nextSID].socketId;
+
       io.to(code).emit('start game');
+      io.to(socketId).emit('start turn');
     })
 
     // Listener for when a player makes a move
-    // Emits to next player the "current turn" event 
-    socket.on('finish turn', async function (code) {
+    // Emits to next player the "start turn" event 
+    socket.on('finish turn', async function (code, letter, position) {
       // get session ID of next player
-      const { player_info, turn_index } = db.getGameByCode(code);
+      let word = await db.addLetter(code, letter, position);
+      const { player_info } = await db.getGameByCode(code);
+      const nextSID = await helpers.getNextPlayer(code, player_info);
       
       // get the socketId of the next player
-      socketId = // TODO
+      const socketId = player_info[nextSID].socketId;
 
-      loadWord(word, code);
+      loadWord(code, word);
       io.to(socketId).emit("start turn");
     })
     
@@ -116,30 +127,30 @@ function runGame() {
     /* _______CHALLENGE LISTENERS____________*/
     
     // Listener for challenger choosing "isWord" challenge
-    socket.on("isword challenge", (code, successful) => {
-      // TODO
-      /* Emits to everyone that a player challenged 
-      After some delay, announce to everyone whether the challenge was successful or not (handled by front-end)
-      by emitting "challenge success" or "challenge fail"
-      Then starts a new round by emitting "new round" to everyone
-      */
+    socket.on("challenge", async function (code, type) {
+      // emits to everyone but the sender
+      const { player_info, turn_index } = await db.getGameByCode(code);
+      const challenger = cookies.getSession(socket);
+      const challenged = helpers.getPreviousPlayer(player_info, turn_index);
+      socket.to(code).emit("challenge pending", challenger, challenged, type);
     });
 
-
-    // Listener for challenger choosing "prompt" challenge
-    socket.on("prompt challenge", (code) => {
-      // TODO
-      /* Emits to everyone that a player challenged 
-      Emit to the player being challenged "prompt" event.
-
-      */
-    });
-
+    // gets whether was challenge was successful
     socket.on("challenge complete", (code, successful) => {
       // TODO
       /* Frontend handles whether or not the word was a phony or not, and after some delay,
       backend emits to everyone whether the challenge was successful or not 
       Then edits score and starts a new round by emitting "new round" to everyone */
+      if (successful) {
+        // TODO: add point to previous player
+      } else {
+        // TODO: add point to sender
+      }
+      
+      io.to(code).emit("challenge complete", successful);
+      setTimeout(() => {
+        loadWord(code, "");
+      }, 3000);
     });
 
     
@@ -147,11 +158,11 @@ function runGame() {
     
     // when a client adds a letter, update it for everyone
     socket.on('letter before', (word, code) => {
-      loadWord(word, code);
+      loadWord(code, word);
     });
   
     socket.on('letter after', (word, code) => {
-      loadWord(word, code);
+      loadWord(code, word);
     });
   
     // reset the word
@@ -161,7 +172,6 @@ function runGame() {
 
     // check word 
     socket.on('check word', (code, success) => {
-      // checkWord(word, code);
       io.to(code).emit("word checked", success)
     })
   });
