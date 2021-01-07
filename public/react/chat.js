@@ -6,6 +6,10 @@ const e = React.createElement;
 var socket = io();
 
 const Chat = () => {
+    const [userName, setName] = useState('');
+    const [message, setMessage] = useState('');
+    const [messages, setMessages] = useState([]);
+
     // Get room code
     let code = window.location.pathname.split('/')[2];
 
@@ -16,18 +20,15 @@ const Chat = () => {
     // Get username of player 
     axios.get(`/api/games/${code}`)
     .then(function (response) {
-        let userName = response['data']['player_info'][SID]['name'];
+        setName(response['data']['player_info'][SID]['name']);
     });
-
-    const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState([]);
 
     useEffect(() => {
         socket.on('message', (message) => {
             console.log("Hey, it's the on that doesn't work")
             setMessages([...messages, message]);
         })
-    });
+    },[messages]);
 
     const sendMessage = (event) => {
         event.preventDefault(); 
@@ -55,11 +56,12 @@ const Chat = () => {
 
                 {/* _________ MESSAGES __________ */ }
                 {/* <React.ScrollToBottom className="messages">
-                    {messages.map((message, i) => <div key={i}>
+                    {messages.map((message, i) => 
+                        <div key={i}>
 
                         
                         
-                    </div>)}
+                        </div>)}
                 </React.ScrollToBottom> */}
                 
                 {/* _________ INPUT __________ */ }

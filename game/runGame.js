@@ -101,7 +101,7 @@ function runGame() {
       db.getGameByCode(code)
       .then(function (data) {
         let userName = data['player_info'][SID]['name'];
-        io.to(code).emit('message', {user: 'userName', text: message});
+        io.to(code).emit('message', {user: userName, text: message});
         callback();
       });
     });
