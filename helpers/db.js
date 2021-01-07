@@ -151,7 +151,6 @@ async function addLetter(code, letter, position) {
 async function incrementTurn(code) {
   try {
     const update = await pool.query("UPDATE games SET turn_index=turn_index+1 WHERE code=$1 AND (state = 0 OR state = 1) RETURNING *", [code]);
-    console.log(update);
     return update.rows[0].turn_index;
   } catch (error) {
     console.error("Could not increment the turn." + error);

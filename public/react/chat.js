@@ -4,10 +4,11 @@ const { useEffect } = React;
 const e = React.createElement;
 
 var socket = io();
+let code = window.location.pathname.split('/')[2];
+socket.emit("join room", code);
 
 const Chat = () => {
     // Get room code
-    let code = window.location.pathname.split('/')[2];
 
     // Get session ID
     let SID = Cookies.get('session');
@@ -31,8 +32,9 @@ const Chat = () => {
 
     const sendMessage = (event) => {
         event.preventDefault(); 
-        if(message) {
-            socket.emit('sendMessage', {code, message}, () => setMessage(''));
+        if (message) {
+            setMessage('');
+            socket.emit('sendMessage', {code, message});
         }
     }
  
