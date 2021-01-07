@@ -44,11 +44,12 @@ function runGame() {
 
         // Get session ID
         let SID = cookies.getSession(socket);
+
         // Get username of player sending the message
         const userName = player_info[SID]['name'];
 
         // Emits welcome message in the chat
-        socket.emit('message', {user: "admin", text: `${userName}, welcome to the room.`});
+        socket.emit('message', {user: "admin", text: `${userName}, welcome to the room ${code}.`});
 
       } catch (error) {
         console.error("Could not get player names. " + error);
@@ -92,16 +93,17 @@ function runGame() {
 
     // for when we implement chats
 
-    socket.on('sendMessage', (message, callback) => {
+    socket.on('sendMessage', ({code, message}, callback) => {
       // Get session ID
       let SID = cookies.getSession(socket);
 
       // Get username of player sending the message
-      const { player_info } = db.getGameByCode(code);
-      const userName = player_info[SID]['name'];
-
-      io.to(code).emit('message', {user: userName, text: message});
-      callback();
+      db.getGameByCode(code)
+      .then(function (data) {
+        let userName = data['player_info'][SID]['name'];
+        io.to(code).emit('message', {user: 'userName', text: message});
+        callback();
+      });
     });
 
     // TODO
