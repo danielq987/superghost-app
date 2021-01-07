@@ -167,7 +167,7 @@ function runGame() {
   
     // reset the word
     socket.on('reset word', (code) => {
-      loadWord("", code);
+      loadWord(code, "");
     });
 
     // check word 
