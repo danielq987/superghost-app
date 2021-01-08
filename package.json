@@ -4,6 +4,8 @@
   "author": "beep boop",
   "description": "my first socket.io app",
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2",
     "base-64": "^1.0.0",
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
@@ -27,5 +29,17 @@
   },
   "engines": {
     "node": "12.18.3"
-  }
+  },
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielq987/superghost-app.git"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danielq987/superghost-app/issues"
+  },
+  "homepage": "https://github.com/danielq987/superghost-app#readme"
 }

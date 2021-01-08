@@ -73,7 +73,7 @@ async function editSocketId(code, SID, socketId) {
     let { player_info : playerInfo } = await getGameByCode(code);
     console.log(playerInfo);
     playerInfo[SID].socketId = socketId;
-    const update = await pool.query("UPDATE games SET player_info = $1 WHERE state = 0 AND code = $2 RETURNING *",
+    const update = await pool.query("UPDATE games SET player_info = $1 WHERE (state = 0 OR state = 1) AND code = $2 RETURNING *",
     [JSON.stringify(playerInfo), code]);
     return update.rows;
   } catch (error) {
@@ -150,10 +150,11 @@ async function addLetter(code, letter, position) {
 
 async function incrementTurn(code) {
   try {
-    const update = await pool.query("UPDATE games SET turn_index=turn_index+1 WHERE code=$1 AND (state=0 OR state=1) RETURNING *", [code]);
+    const update = await pool.query("UPDATE games SET turn_index=turn_index+1 WHERE code=$1 AND (state = 0 OR state = 1) RETURNING *", [code]);
+
     return update.rows[0].turn_index;
   } catch (error) {
-    console.error("Could not increment the turn.");
+    console.error("Could not increment the turn." + error);
   }
 }
 

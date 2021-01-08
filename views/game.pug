@@ -3,6 +3,8 @@ extends layout
 block content
   //- The game goes in this div!
   #game-container 
+    //- Chat Component
+    <div id="chat_container"></div>
   #word-wrapper
     h1#main-word []
   form(action="")
@@ -29,7 +31,23 @@ block content
   //- react sources
   script(src="https://unpkg.com/react@17/umd/react.development.js" crossorigin)
   script(src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin)
+
+  script(src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin)
+  script(src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js" crossorigin)
+  script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" crossorigin)
+  script(src="https://cdn.jsdelivr.net/npm/react-scroll-to-bottom@4.1.0/lib/index.min.js" crossorigin)
+
+  style
+    include ../public/css/chat.css
+    include ../public/css/input.css
+    include ../public/css/infoBar.css
+    include ../public/css/message.css
+    include ../public/css/messages.css
+
+  //- Chat react sources
+  script(type="text/babel" src="/public/react/chat.js")
+
   //-axios
-  script(src="https://unpkg.com/axios/dist/axios.min.js")
-  script(src="/public/react/word-check-file.js")
+  //-script(src="https://unpkg.com/axios/dist/axios.min.js")
+  //-script(src="/public/react/word-check-file.js")
   

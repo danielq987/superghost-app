@@ -46,24 +46,38 @@ function runGame() {
         // gets all player names and emit the list
         const names = await helpers.getPlayerNames(player_info);
         io.to(code).emit("load player list", names.sort());
+
+        // Get session ID
+        let SID = cookies.getSession(socket);
+
+        // Get username of player sending the message
+        const userName = player_info[SID]['name'];
+
+        // Emits welcome message in the chat
+        socket.emit('message', {user: "admin", text: `${userName}, welcome to the room ${code}.`});
+
       } catch (error) {
-        console.log("Could not get player names. " + error);
+        console.error("Could not get player names. " + error);
       }
     });
 
     // Listener for game start
     // emits the 'start game event' to everyone in the room
-    socket.on("start game", async (code) => {
-      await db.startGame(code);
-
-      const { player_info } = await db.getGameByCode(code);
-      const nextSID = await helpers.getNextPlayer(code, player_info);
-      console.log(nextSID);
-      const socketId = player_info[nextSID].socketId;
-
-      io.to(code).emit("start game");
-      io.to(socketId).emit("start turn");
-    });
+    socket.on('start game', async (code) => {
+      try {
+        await db.startGame(code);
+        
+        const { player_info } = await db.getGameByCode(code);
+        const nextSID = await helpers.getNextPlayer(code, player_info);
+        
+        const socketId = player_info[nextSID].socketId;
+  
+        io.to(code).emit('start game');
+        io.to(socketId).emit('start turn');
+      } catch (error) {
+        console.log(`Error starting game. ${error}`);
+      }
+    })
 
     // Listener for when a player makes a move
     // Emits to next player the "start turn" event
@@ -87,8 +101,22 @@ function runGame() {
     /* _______CHAT LISTENERS____________ */
 
     // for when we implement chats
-    socket.on("chat message", (code, msg) => {
-      io.to(code).emit("chat message", msg);
+
+
+    socket.on('sendMessage', async ({code, message}) => {
+      // Get session ID
+      let SID = cookies.getSession(socket);
+
+      // Get username of player sending the message
+      const data = await db.getGameByCode(code);
+      console.log(code);
+      let userName = data['player_info'][SID]['name'];
+      io.to(code).emit('message', {user: userName, text: message});
+
+      //code that was present before chat was implemented 
+        //socket.on("chat message", (code, msg) => {
+        // io.to(code).emit("chat message", msg);
+
     });
 
     // TODO
