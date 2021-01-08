@@ -33,7 +33,7 @@ router.put('/remove-player/:code', function (req, res, next) {
 })
 
 // gets a specific game's information
-router.get('/games/:code', function (req, res, next) {
+router.get('/game/:code', function (req, res, next) {
   db.getGameByCode(req.params.code).then(response => {
     response.current_player_SID = Object.keys(response.player_info).sort()[response.turn_index];
     res.json(response);
@@ -41,19 +41,19 @@ router.get('/games/:code', function (req, res, next) {
 });
 
 // get player infos of all players in the room
-router.get('/games/:code/players', function (req, res, next) {
+router.get('/game/:code/players', function (req, res, next) {
   db.getGameByCode(req.params.code).then(response => res.json(response.player_info));
 });
 
 // get a specific player information, given their session id
-router.get('/games/:code/player/:SID', function (req, res, next) {
+router.get('/game/:code/player/:SID', function (req, res, next) {
   db.getGameByCode(req.params.code).then(response => {
     res.json(response.player_info[SID]);
   });
 });
 
 // idk yet
-router.delete('/games/:code', async function (req, res, next) {
+router.delete('/game/:code', async function (req, res, next) {
   res.json("todo");
 });
 

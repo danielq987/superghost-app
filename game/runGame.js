@@ -2,33 +2,38 @@ const io = require("../app").io;
 const db = require("../helpers/db");
 const cookies = require("../helpers/cookies");
 const helpers = require("./gameHelpers");
+// const axios = require('axios');
 
 // functions and listeners pertaining to the game
 function runGame() {
   // updates the word in the database
   // fires the 'load word' event to update the current word for all sockets
-  async function loadWord(code, str) {
+  async function loadWord(code, letter, position) {
     try {
-      response = await db.updateWord(str, code);
+      response = await db.addLetter(code, letter, position);
       io.to(code).emit("load word", response);
     } catch (error) {
-      console.error(err);
+      console.error("Could not update word" + error);
     }
   }
-  
-  io.on('connection', function onConnect (socket) {
 
+  io.on("connection", function onConnect(socket) {
     /* __________GENERAL GAME SETUP LISTENERS___________ */
 
-    // listener for when client joins a room 
-    socket.on('join room', async function joinRoom (code) {
+    // listener for when client joins a room
+    socket.on("join room", async function joinRoom(code) {
       socket.join(code);
       try {
         // update socketId in database
         await db.editSocketId(code, cookies.getSession(socket), socket.id);
 
         // get the game info
-        const { state, player_info, current_word, turn_index } = await db.getGameByCode(code);
+        const {
+          state,
+          player_info,
+          current_word,
+          turn_index,
+        } = await db.getGameByCode(code);
 
         // if game has started, update the word
         if (state == 1) {
@@ -55,7 +60,7 @@ function runGame() {
         console.error("Could not get player names. " + error);
       }
     });
-    
+
     // Listener for game start
     // emits the 'start game event' to everyone in the room
     socket.on('start game', async (code) => {
@@ -75,23 +80,28 @@ function runGame() {
     })
 
     // Listener for when a player makes a move
-    // Emits to next player the "start turn" event 
-    socket.on('finish turn', async function (code, letter, position) {
-      // get session ID of next player
-      let word = await db.addLetter(code, letter, position);
-      const { player_info } = await db.getGameByCode(code);
-      const nextSID = await helpers.getNextPlayer(code, player_info);
-      
-      // get the socketId of the next player
-      const socketId = player_info[nextSID].socketId;
+    // Emits to next player the "start turn" event
+    socket.on("finish turn", async function (code, letter, position) {
+      try {
+        // get session ID of next player
+        const { player_info } = await db.getGameByCode(code);
+        const nextSID = await helpers.getNextPlayer(code, player_info);
 
-      loadWord(code, word);
-      io.to(socketId).emit("start turn");
-    })
-    
+        // console.log(nextSID);
+        // get the socketId of the next player
+        const socketId = player_info[nextSID].socketId;
+
+        loadWord(code, letter, position);
+        io.to(socketId).emit("start turn");
+      } catch (error) {
+        console.log("Could not complete player turn. " + error);
+      }
+    });
+
     /* _______CHAT LISTENERS____________ */
 
     // for when we implement chats
+
 
     socket.on('sendMessage', async ({code, message}) => {
       // Get session ID
@@ -102,12 +112,17 @@ function runGame() {
       console.log(code);
       let userName = data['player_info'][SID]['name'];
       io.to(code).emit('message', {user: userName, text: message});
+
+      //code that was present before chat was implemented 
+        //socket.on("chat message", (code, msg) => {
+        // io.to(code).emit("chat message", msg);
+
     });
 
     // TODO
 
     /* _______CHALLENGE LISTENERS____________*/
-    
+
     // Listener for challenger choosing "isWord" challenge
     socket.on("challenge", async function (code, type) {
       // emits to everyone but the sender
@@ -128,31 +143,35 @@ function runGame() {
       } else {
         // TODO: add point to sender
       }
-      
+
       io.to(code).emit("challenge complete", successful);
       setTimeout(() => {
         loadWord(code, "");
       }, 3000);
     });
 
-    
     // LEGACY LISTENERS __________________
-    
+
     // when a client adds a letter, update it for everyone
-    socket.on('letter before', (word, code) => {
+    socket.on("letter before", (word, code) => {
       loadWord(code, word);
     });
-  
-    socket.on('letter after', (word, code) => {
+
+    socket.on("letter after", (word, code) => {
       loadWord(code, word);
     });
-  
+
     // reset the word
-    socket.on('reset word', (code) => {
-      loadWord(code, "");
-    })
+    socket.on("reset word", async (code) => {
+      await db.resetWord(code);
+      io.to(code).emit("load word", "");
+    });
+
+    // check word
+    socket.on("check word", (code, success) => {
+      io.to(code).emit("word checked", success);
+    });
   });
 }
-
 
 module.exports = runGame;

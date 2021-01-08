@@ -15,16 +15,23 @@ block content
       button(type="button")#submit-after After
       br
       button(type="button")#reset-word Reset Word
+      br
+      button(type="button")#check-word Check Word
+      //-#check-word
 
   br
   h3 Players
   ul#player-list
+
+  h3#test
+  h3#debug
   script(src="/socket.io/socket.io.js")
   script(src="/public/js/game-client.js")
 
   //- react sources
   script(src="https://unpkg.com/react@17/umd/react.development.js" crossorigin)
   script(src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin)
+
   script(src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin)
   script(src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js" crossorigin)
   script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" crossorigin)
@@ -39,4 +46,8 @@ block content
 
   //- Chat react sources
   script(type="text/babel" src="/public/react/chat.js")
+
+  //-axios
+  //-script(src="https://unpkg.com/axios/dist/axios.min.js")
+  //-script(src="/public/react/word-check-file.js")
   
