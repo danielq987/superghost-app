@@ -16,6 +16,7 @@
     "nodemon": "^2.0.6",
     "pg": "^8.5.1",
     "pug": "^3.0.0",
+    "python-shell": "^2.0.3",
     "randomstring": "^1.1.5",
     "socket.io": "^3.0.3",
     "utf8": "^3.0.0",
