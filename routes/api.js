@@ -67,10 +67,12 @@ router.get("/game/:code/player/:SID", function (req, res, next) {
 });
 
 router.get("/ai/:str", function (req, res, next) {
-  let process = spawn("python", ["./game.py", req.params.str]);
+  let process = spawn("python3", ["./game/game.py", req.params.str]);
+
+  // let process = spawn("cd", ["game"]);
 
   process.stdout.on("data", function (data) {
-    res.send(data.toString());
+    res.json(data.toString());
   });
 });
 // idk yet
