@@ -24,11 +24,6 @@ block content
   h3#test
   h3#debug
 
-  if ai
-    script(src="/public/js/ai.js")
-  else
-    script(src="/socket.io/socket.io.js")
-    script(src="/public/js/game-client.js")
 
   //- react sources
   script(src="https://unpkg.com/react@17/umd/react.development.js" crossorigin)
@@ -37,3 +32,8 @@ block content
   script(src="https://unpkg.com/axios/dist/axios.min.js")
   script(src="/public/react/word-check-file.js")
   
+  if ai
+    script(src="/public/js/ai.js")
+  else
+    script(src="/socket.io/socket.io.js")
+    script(src="/public/js/game-client.js")
