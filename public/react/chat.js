@@ -35,8 +35,6 @@ const Chat = () => {
             socket.emit('sendMessage', {code, message});
         }
     }
- 
-    console.log(message, messages);
 
     return (
         <div className="outerContainer-chat">
@@ -55,15 +53,13 @@ const Chat = () => {
 
                 {/* _________ MESSAGES __________ */ }
                 
-                <div className="messages">
+                <ScrollToBottom className="messages">
                     {messages.map((message, i) => 
                         <div key={i}>
                             {(() => {
                                 let isSentByCurrentUser = false;
 
                                 const trimmedName = userName.trim();
-                                console.log(`trimmed: ${trimmedName}`);
-                                console.log(`message sent by: ${message['user']}`);
                             
                                 if (message['user'] === trimmedName) {
                                     isSentByCurrentUser = true;
@@ -75,7 +71,7 @@ const Chat = () => {
                                     <div className="messageContainer justifyEnd">
                                         <p className="sentText pr-10">{userName}</p>
                                         <div className="messageBox backgroundBlue">
-                                            <p className="messageText colorWhite">{message['text']}</p>
+                                            <p className="messageText colorWhite">{((message['text']))}</p>
                                         </div>
                                     </div>
                                     )
@@ -92,7 +88,7 @@ const Chat = () => {
                                 }
                             })()}
                         </div>)}
-                </div>
+                </ScrollToBottom>
                 
                 {/* _________ INPUT __________ */ }
 
