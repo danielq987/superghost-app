@@ -4,14 +4,13 @@ const { useEffect } = React;
 const e = React.createElement;
 
 var socket = io();
+let code = window.location.pathname.split('/')[2];
+socket.emit("join room", code);
 
 const Chat = () => {
     const [userName, setName] = useState('');
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
-
-    // Get room code
-    let code = window.location.pathname.split('/')[2];
 
     // Get session ID
     let SID = Cookies.get('session');
@@ -24,16 +23,16 @@ const Chat = () => {
     });
 
     useEffect(() => {
-        socket.on('message', (message) => {
-            console.log("Hey, it's the on that doesn't work")
-            setMessages([...messages, message]);
-        })
-    },[messages]);
+        socket.on('message', message => {
+            setMessages(messages => [ ...messages, message ]);
+        });
+    },[]);
 
     const sendMessage = (event) => {
         event.preventDefault(); 
-        if(message) {
-            socket.emit('sendMessage', {code, message}, () => setMessage(''));
+        if (message) {
+            setMessage('');
+            socket.emit('sendMessage', {code, message});
         }
     }
  
@@ -55,14 +54,63 @@ const Chat = () => {
                 </div>
 
                 {/* _________ MESSAGES __________ */ }
-                {/* <React.ScrollToBottom className="messages">
+                
+                <div className="messages">
                     {messages.map((message, i) => 
                         <div key={i}>
+                            {(() => {
+                                let isSentByCurrentUser = false;
 
-                        
-                        
+                                const trimmedName = userName.trim();
+                                console.log(`trimmed: ${trimmedName}`);
+                                console.log(`message sent by: ${message['user']}`);
+                            
+                                if (message['user'] === trimmedName) {
+                                    isSentByCurrentUser = true;
+                                }
+
+                                if (isSentByCurrentUser)
+                                {
+                                    return(
+                                    <div className="messageContainer justifyEnd">
+                                        <p className="sentText pr-10">{userName}</p>
+                                        <div className="messageBox backgroundBlue">
+                                            <p className="messageText colorWhite">{message['text']}</p>
+                                        </div>
+                                    </div>
+                                    )
+                                }
+                                else {
+                                    return (
+                                    <div className="messageContainer justifyStart">
+                                        <div className="messageBox backgroundLight">
+                                            <p className="messageText colorDark">{message['text']}</p>
+                                        </div>
+                                        <p className="sentText pl-10">{message['user']}</p>
+                                    </div>
+                                    )
+                                }
+                            })()}
+                            {/* {
+                            isSentByCurrentUser
+                            ? (
+                                <div className="messageContainer justifyEnd">
+                                    <p className="sentText pr-10">{userName}</p>
+                                    <div className="messageBox backgroundBlue">
+                                        <p className="messageText colorWhite">{message['text']}</p>
+                                    </div>
+                                </div>
+                            )
+                            : (
+                                <div className="messageContainer justifyStart">
+                                    <div className="messageBox backgroundLight">
+                                        <p className="messageText colorDark">{message['text']}</p>
+                                    </div>
+                                    <p className="sentText pl-10">{message['user']}</p>
+                                </div>
+                            )} */}
                         </div>)}
-                </React.ScrollToBottom> */}
+                </div>
                 
                 {/* _________ INPUT __________ */ }
 

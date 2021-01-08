@@ -93,17 +93,15 @@ function runGame() {
 
     // for when we implement chats
 
-    socket.on('sendMessage', ({code, message}, callback) => {
+    socket.on('sendMessage', async ({code, message}) => {
       // Get session ID
       let SID = cookies.getSession(socket);
 
       // Get username of player sending the message
-      db.getGameByCode(code)
-      .then(function (data) {
-        let userName = data['player_info'][SID]['name'];
-        io.to(code).emit('message', {user: userName, text: message});
-        callback();
-      });
+      const data = await db.getGameByCode(code);
+      console.log(code);
+      let userName = data['player_info'][SID]['name'];
+      io.to(code).emit('message', {user: userName, text: message});
     });
 
     // TODO
