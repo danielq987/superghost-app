@@ -1,4 +1,17 @@
 extends layout
 
+block lbanner
+  #banner
+    .navbar-header
+      a(href="/") SuperGhost Online
+
 block content
   h1 Uh oh! This page does not exist.
+
+block abouts
+  div.about
+    a(href="/about") About
+    | 
+    a(href="https://github.com/danielq987/superghost-app")
+      button(type=button)#github
+        img(src="/public/img/mark-github.svg")
