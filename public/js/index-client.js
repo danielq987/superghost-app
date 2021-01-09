@@ -25,6 +25,7 @@ $(document).ready(function () {
 
     try {
       let gameInfo = await axios.get(`/api/games/${code}`);
+      console.log(gameInfo)
       if (gameInfo.data != null && gameInfo.data.state == 0) {
         // add the new player's SID to the database
         let response = axios.put(`/api/join-game/${code}`, { name: name });
