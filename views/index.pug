@@ -1,14 +1,21 @@
 extends layout
 
+block lbanner
+  .index-banner
+    a(href="/") SuperGhost Online
+
 block content
+  
+  img(src='/public/img/sg.png' alt='ghost' style='width:200px;height:200px;')
   script(src="https://unpkg.com/axios/dist/axios.min.js")
   script(src="/public/js/index-client.js")
-  p hello!!!!!
+  p welcome to superghost online!
   br
   input(type="text" placeholder="Enter Name")#game-name
-  button(type=button)#create-room-btn Create Room!
   br
   input(type="text" placeholder="Enter Code")#game-code
+  br
+  button(type=button)#create-room-btn Create Room!
   button(type=button)#join-room-btn Join Room! 
   br
   a(href="/ai") If you wanna lose against a computer, click here!

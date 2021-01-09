@@ -1,7 +1,13 @@
 extends layout
 
+block lbanner
+  #banner
+    .navbar-header
+      a(href="/") SuperGhost Online
+
 block content
   button(type="button")#start-game START GAME
   ul#player-list
   script(src="/socket.io/socket.io.js")
   script(src="/public/js/game-client.js")
+

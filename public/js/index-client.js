@@ -39,7 +39,7 @@ $(document).ready(function () {
 
     // get the game info to ensure that the room exists and is open
     axios
-      .get(`/api/games/${code}`)
+      .get(`/api/game/${code}`)
       .then((response) => {
         console.log(response.data);
         if (response.data != null && response.data.state == 0) {
