@@ -17,7 +17,7 @@ const Chat = () => {
     SID = atob(SID).split('"SID":"').pop().split('"}')[0];
 
     // Get username of player 
-    axios.get(`/api/games/${code}`)
+    axios.get(`/api/game/${code}`)
     .then(function (response) {
         setName(response['data']['player_info'][SID]['name']);
     });
@@ -53,7 +53,7 @@ const Chat = () => {
 
                 {/* _________ MESSAGES __________ */ }
                 
-                <ScrollToBottom className="messages">
+                <div className="messages">
                     {messages.map((message, i) => 
                         <div key={i}>
                             {(() => {
@@ -88,7 +88,7 @@ const Chat = () => {
                                 }
                             })()}
                         </div>)}
-                </ScrollToBottom>
+                </div>
                 
                 {/* _________ INPUT __________ */ }
 
