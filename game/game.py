@@ -87,9 +87,9 @@ def zykaChoose(node, zturn):
         # sorts the children and takes the ones with the highest probabilities
         moves.sort(key=takeFirst)
         try:
-            choice = random.choice(moves[:5])
+            choice = random.choice(moves[-5:])
         except:
-            choice = moves[0]
+            choice = moves[-1]
     # returns the chosen word
     return choice[1].getName()
 

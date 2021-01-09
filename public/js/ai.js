@@ -5,9 +5,14 @@ $(document).ready(() => {
   let points = new Map();
   points["player"] = 0;
   points["ai"] = 0;
-
+  showScore();
   function renderWord() {
     $("#main-word").text("[" + currentWord + "]");
+  }
+
+  function showScore() {
+    $("#score").text(`Score: Player [${points.player}], AI [${points.ai}]`);
+    updateWord("");
   }
 
   function disableButtons() {
@@ -20,6 +25,8 @@ $(document).ready(() => {
 
   function updateWord(word) {
     currentWord = word;
+    $("#letter").val("");
+    $("#letter").focus();
     renderWord();
   }
 
@@ -42,11 +49,15 @@ $(document).ready(() => {
   function aiChallenge(option) {
     switch (option) {
       case "-1":
+        $("#alert").html("This is a word.");
         break;
-
       case "-2":
+        $("#alert").html("This word has no continuations.");
+
         break;
     }
+    points["ai"]++;
+    showScore();
   }
 
   $("#submit-before").on("click", (e) => {
@@ -66,8 +77,14 @@ $(document).ready(() => {
     console.log("pressed");
     aiTurn();
   });
-  setInterval(() => {
-    if (playerTurn) {
-    }
-  }, 1000);
+
+  $("#challenge").on("click", async (e) => {
+    e.preventDefault();
+    disableButtons();
+    let { data } = await axios.get(`/api/ai/_${currentWord}`);
+    $("#alert").text(`The computer was going for ${data}!`);
+    points["ai"]++;
+    showScore();
+    enableButtons();
+  });
 });
