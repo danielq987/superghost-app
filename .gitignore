@@ -1,4 +1,4 @@
 node_modules
 
 .env
-game/__pychache__
+game/__pychache__/
